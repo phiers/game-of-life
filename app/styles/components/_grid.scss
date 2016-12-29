@@ -1,0 +1,20 @@
+.grid {
+
+  background: black;
+  // width: 50em;
+  line-height: .6;
+  margin: 0 auto;
+
+  .grid-cell {
+    box-sizing: border-box;
+    display: inline-block;
+    min-width: 1em;
+    min-height: 1em;
+    border: .1px solid darkgray;
+  }
+
+  #on {
+    background: white;
+  }
+
+}
