@@ -1,43 +1,34 @@
-import React from 'react';
+import React, { PropTypes, Component } from 'react';
+import { connect } from 'react-redux';
 
 import Cell from 'Cell'; // eslint-disable-line
 
-const gridStyle = {
-  width: '60em',
-};
+class Grid extends Component {
 
-export default class Grid extends React.Component {
-  constructor() {
-    super();
-    this.state = {
-      running: true,
-      width: '60em',
-      cells: 2400,
-      speed: 'normal',
-      generations: 1,
-      status: [],
-    };
-    this.handleCellClick = this.handleCellClick.bind(this);
-  }
-
-  handleCellClick(pos) {
-    console.log(pos); // pos will be index in state.status array
-  }
-  renderCells() {
-    const arr = [];
-    for (let i = 0; i < 2400; i += 1) {
-      const status = i % 60 === 0 ? 'on' : 'off';
-      arr.push(status);
-    }
-    return arr.map((item, index) => { // needs to be rendered from state
-      return <Cell key={index} pos={index} status={item} updateStatus={this.handleCellClick} />;
-    });
-  }
   render() {
+    const { status, width } = this.props.grid;
+    const renderCells = () => {
+      if (!status) {
+        return <p>Loading...</p>;
+      }
+      return status.map((item, index) =>
+        <Cell key={index} pos={index} status={item} />,
+      );
+    };
     return (
-      <div className="grid" style={gridStyle}>
-        {this.renderCells()}
+      <div className="grid" style={{ width }}>
+        {renderCells()}
       </div>
     );
   }
 }
+
+
+export default connect(state => state)(Grid);
+
+Grid.propTypes = {
+  grid: PropTypes.shape({
+    status: PropTypes.array.isRequired,
+    width: PropTypes.string.isRequired,
+  }),
+};

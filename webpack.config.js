@@ -26,7 +26,9 @@ module.exports = {
       'node_modules',
       './app/components',
       './app/api',
-      //'./app/actions',
+      './app/actions',
+      './app/store',
+      './app/reducers',
     ],
     alias: {
       applicationStyles: 'app/styles/app.scss',
@@ -37,7 +39,7 @@ module.exports = {
     loaders: [{
       loader: 'babel-loader',
       query: {
-        presets: ['react', 'es2015'],
+        presets: ['react', 'es2015', 'stage-0'],
       },
       test: /\.jsx?$/,
       exclude: /(node_modules|bower_components)/,

@@ -7,7 +7,7 @@ const TitleBar = () => (
     </div>
     <div className="top-bar-right">
       <p className="menu-text">View source code on
-        <a href="https://github.com/phiers/markdown-previewer" rel="noopener noreferrer" target="_blank"> GitHub</a>
+        <a href="https://github.com/phiers/game-of-life" rel="noopener noreferrer" target="_blank"> GitHub</a>
       </p>
     </div>
   </div>

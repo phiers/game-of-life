@@ -1,9 +1,17 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-// import { Route, Router, IndexRoute, hashHistory } from 'react-router';
+import { Provider } from 'react-redux';
 /* eslint-disable */
 import Main from 'Main';
+import store from 'configureStore';
+import actions from 'actions';
 
+store.subscribe(() => {
+  const state = store.getState();
+  console.log(state);
+});
+// TODO: add dispatch to activate grid
+// store.dispatch(actions.setGridSize(width, height));
 // Load foundation
 
 $(document).foundation();
@@ -12,7 +20,9 @@ require('style!css!sass!applicationStyles');
 /* eslint-enable */
 
 ReactDOM.render(
-  <div>
-    <Main />
-  </div>,
+  <Provider store={store}>
+    <div>
+      <Main />
+    </div>
+  </Provider>,
     document.getElementById('app')); //eslint-disable-line

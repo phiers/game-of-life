@@ -1,0 +1,61 @@
+.controls {
+  background: black;
+  width: 45em;
+  margin: 0 auto;
+}
+
+.top-controls {
+  display: flex;
+  .flex-items {
+    flex: 1;
+    display: flex;
+    .button-group {
+      flex: 1;
+      margin: 0 auto;
+    }
+    button {
+      width: 6em;
+    }
+    button:active,
+    button:focus {
+      outline: none;
+    }
+    p {
+      background: #767676;
+      color: white;
+      margin: 0 auto;
+      padding: .5em .2em .2em .5em;
+
+      span {
+        color: red;
+        font-weight: bolder;
+        padding: .1em .5em;
+      }
+    }
+  }
+}
+
+.bottom-controls {
+  display: flex;
+  .flex-items {
+    flex: 1;
+    display: flex;
+    .button-group {
+      flex: 1;
+      margin: 0;
+    }
+    button {
+      width: 6em;
+    }
+    button:active,
+    button:focus {
+      outline: none;
+    }
+    p {
+      background: white;
+      color: black;
+      margin: 0 .15em 0 0;
+      padding: .5em .8em 0 .4em;
+    }
+  }
+}
