@@ -11,13 +11,13 @@ class Cell extends Component {
   handleClick(evt) {
     const { dispatch, id, running } = this.props;
     evt.preventDefault();
-    if (running) { // TODO: need to change this to !running
+    if (!running) {
       dispatch(actions.toggleCell(id));
     }
   }
   render() {
     const { alive } = this.props;
-    const cellClass = alive ? 'grid-cell on' : 'grid-cell';
+    const cellClass = alive === 1 ? 'grid-cell on' : 'grid-cell';
 
     return (
       <div className={cellClass} onClick={this.handleClick} /> // eslint-disable-line
@@ -28,7 +28,7 @@ class Cell extends Component {
 export default connect()(Cell);
 
 Cell.propTypes = {
-  alive: PropTypes.bool.isRequired,
+  alive: PropTypes.number.isRequired,
   dispatch: PropTypes.func.isRequired,
   id: PropTypes.number.isRequired,
   running: PropTypes.bool.isRequired,

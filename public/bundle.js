@@ -112,18 +112,14 @@
 
 	var _configureStore2 = _interopRequireDefault(_configureStore);
 
-	var _actions = __webpack_require__(229);
+	var _actions = __webpack_require__(226);
 
 	var _actions2 = _interopRequireDefault(_actions);
 
+	var _run = __webpack_require__(236);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	_configureStore2.default.subscribe(function () {
-	  var state = _configureStore2.default.getState();
-	  console.log(state);
-	});
-	// TODO: add dispatch to activate grid
-	// store.dispatch(actions.setGridSize(width, height));
 	// Load foundation
 
 	/* eslint-disable */
@@ -131,6 +127,13 @@
 	// App css
 	__webpack_require__(232);
 	/* eslint-enable */
+
+	_configureStore2.default.subscribe(function () {
+	  var state = _configureStore2.default.getState();
+	  console.log(state);
+	});
+	// TODO: add dispatch to activate grid
+	_configureStore2.default.dispatch(_actions2.default.loadRandomGrid((0, _run.generateArr)()));
 
 	_reactDom2.default.render(_react2.default.createElement(
 	  _reactRedux.Provider,
@@ -23803,11 +23806,11 @@
 
 	var _Grid2 = _interopRequireDefault(_Grid);
 
-	var _TopControls = __webpack_require__(227);
+	var _TopControls = __webpack_require__(228);
 
 	var _TopControls2 = _interopRequireDefault(_TopControls);
 
-	var _BottomControls = __webpack_require__(228);
+	var _BottomControls = __webpack_require__(229);
 
 	var _BottomControls2 = _interopRequireDefault(_BottomControls);
 
@@ -23905,11 +23908,11 @@
 
 	var _reactRedux = __webpack_require__(185);
 
-	var _actions = __webpack_require__(229);
+	var _actions = __webpack_require__(226);
 
 	var _actions2 = _interopRequireDefault(_actions);
 
-	var _Cell = __webpack_require__(226);
+	var _Cell = __webpack_require__(227);
 
 	var _Cell2 = _interopRequireDefault(_Cell);
 
@@ -23979,6 +23982,53 @@
 
 /***/ },
 /* 226 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	var actions = {
+	  clearGrid: function clearGrid() {
+	    return {
+	      type: 'CLEAR_GRID'
+	    };
+	  },
+	  loadRandomGrid: function loadRandomGrid(array) {
+	    return {
+	      type: 'LOAD_RANDOM_GRID',
+	      array: array
+	    };
+	  },
+	  pauseGrid: function pauseGrid() {
+	    return {
+	      type: 'PAUSE_GRID'
+	    };
+	  },
+	  runGrid: function runGrid() {
+	    return {
+	      type: 'RUN_GRID' };
+	  },
+	  setGridSize: function setGridSize(width, height) {
+	    return {
+	      type: 'SET_GRID_SIZE',
+	      width: width,
+	      height: height
+	    };
+	  },
+	  toggleCell: function toggleCell(id) {
+	    return {
+	      type: 'TOGGLE_CELL',
+	      id: id
+	    };
+	  }
+	};
+
+	exports.default = actions;
+
+/***/ },
+/* 227 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -23995,7 +24045,7 @@
 
 	var _reactRedux = __webpack_require__(185);
 
-	var _actions = __webpack_require__(229);
+	var _actions = __webpack_require__(226);
 
 	var _actions2 = _interopRequireDefault(_actions);
 
@@ -24031,8 +24081,7 @@
 	          running = _props.running;
 
 	      evt.preventDefault();
-	      if (running) {
-	        // TODO: need to change this to !running
+	      if (!running) {
 	        dispatch(_actions2.default.toggleCell(id));
 	      }
 	    }
@@ -24041,7 +24090,7 @@
 	    value: function render() {
 	      var alive = this.props.alive;
 
-	      var cellClass = alive ? 'grid-cell on' : 'grid-cell';
+	      var cellClass = alive === 1 ? 'grid-cell on' : 'grid-cell';
 
 	      return _react2.default.createElement('div', { className: cellClass, onClick: this.handleClick }) // eslint-disable-line
 	      ;
@@ -24055,92 +24104,11 @@
 
 
 	Cell.propTypes = {
-	  alive: _react.PropTypes.bool.isRequired,
+	  alive: _react.PropTypes.number.isRequired,
 	  dispatch: _react.PropTypes.func.isRequired,
 	  id: _react.PropTypes.number.isRequired,
 	  running: _react.PropTypes.bool.isRequired
 	};
-
-/***/ },
-/* 227 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-	var _react = __webpack_require__(8);
-
-	var _react2 = _interopRequireDefault(_react);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-	var TopControls = function (_React$Component) {
-	  _inherits(TopControls, _React$Component);
-
-	  function TopControls() {
-	    _classCallCheck(this, TopControls);
-
-	    return _possibleConstructorReturn(this, (TopControls.__proto__ || Object.getPrototypeOf(TopControls)).apply(this, arguments));
-	  }
-
-	  _createClass(TopControls, [{
-	    key: "render",
-	    value: function render() {
-	      return _react2.default.createElement(
-	        "div",
-	        { className: "controls top-controls" },
-	        _react2.default.createElement(
-	          "div",
-	          { className: "flex-items" },
-	          _react2.default.createElement(
-	            "div",
-	            { className: "secondary button-group" },
-	            _react2.default.createElement(
-	              "button",
-	              { className: "button" },
-	              "Run"
-	            ),
-	            _react2.default.createElement(
-	              "button",
-	              { className: "button" },
-	              "Pause"
-	            ),
-	            _react2.default.createElement(
-	              "button",
-	              { className: "button" },
-	              "Clear"
-	            )
-	          ),
-	          _react2.default.createElement(
-	            "p",
-	            null,
-	            "Generations: ",
-	            _react2.default.createElement(
-	              "span",
-	              null,
-	              "0"
-	            )
-	          )
-	        )
-	      );
-	    }
-	  }]);
-
-	  return TopControls;
-	}(_react2.default.Component);
-
-	exports.default = TopControls;
 
 /***/ },
 /* 228 */
@@ -24160,7 +24128,114 @@
 
 	var _reactRedux = __webpack_require__(185);
 
-	var _actions = __webpack_require__(229);
+	var _actions = __webpack_require__(226);
+
+	var _actions2 = _interopRequireDefault(_actions);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	// eslint-disable-line
+	/* eslint-disable max-len */
+	var TopControls = function (_Component) {
+	  _inherits(TopControls, _Component);
+
+	  function TopControls() {
+	    _classCallCheck(this, TopControls);
+
+	    return _possibleConstructorReturn(this, (TopControls.__proto__ || Object.getPrototypeOf(TopControls)).apply(this, arguments));
+	  }
+
+	  _createClass(TopControls, [{
+	    key: 'render',
+	    value: function render() {
+	      var dispatch = this.props.dispatch;
+
+	      return _react2.default.createElement(
+	        'div',
+	        { className: 'controls top-controls' },
+	        _react2.default.createElement(
+	          'div',
+	          { className: 'flex-items' },
+	          _react2.default.createElement(
+	            'div',
+	            { className: 'secondary button-group' },
+	            _react2.default.createElement(
+	              'button',
+	              { className: 'button', onClick: function onClick() {
+	                  dispatch(_actions2.default.runGrid());
+	                } },
+	              'Run'
+	            ),
+	            _react2.default.createElement(
+	              'button',
+	              { className: 'button', onClick: function onClick() {
+	                  dispatch(_actions2.default.pauseGrid());
+	                } },
+	              'Pause'
+	            ),
+	            _react2.default.createElement(
+	              'button',
+	              { className: 'button', onClick: function onClick() {
+	                  dispatch(_actions2.default.clearGrid());
+	                } },
+	              'Clear'
+	            )
+	          ),
+	          _react2.default.createElement(
+	            'p',
+	            null,
+	            'Generations: ',
+	            _react2.default.createElement(
+	              'span',
+	              null,
+	              this.props.grid.generation
+	            )
+	          )
+	        )
+	      );
+	    }
+	  }]);
+
+	  return TopControls;
+	}(_react.Component);
+
+	exports.default = (0, _reactRedux.connect)(function (state) {
+	  return state;
+	})(TopControls);
+
+
+	TopControls.propTypes = {
+	  dispatch: _react.PropTypes.func.isRequired,
+	  grid: _react.PropTypes.shape({
+	    generation: _react.PropTypes.number.isRequired
+	  })
+	};
+
+/***/ },
+/* 229 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _react = __webpack_require__(8);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _reactRedux = __webpack_require__(185);
+
+	var _actions = __webpack_require__(226);
 
 	var _actions2 = _interopRequireDefault(_actions);
 
@@ -24270,33 +24345,6 @@
 	};
 
 /***/ },
-/* 229 */
-/***/ function(module, exports) {
-
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	var actions = {
-	  setGridSize: function setGridSize(width, height) {
-	    return {
-	      type: 'SET_GRID_SIZE',
-	      width: width,
-	      height: height
-	    };
-	  },
-	  toggleCell: function toggleCell(id) {
-	    return {
-	      type: 'TOGGLE_CELL',
-	      id: id
-	    };
-	  }
-	};
-
-	exports.default = actions;
-
-/***/ },
 /* 230 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -24339,7 +24387,7 @@
 	/* eslint-disable no-plusplus */
 	var cells = [];
 	for (var i = 0; i < 3500; i++) {
-	  cells.push({ id: i, alive: false });
+	  cells.push({ id: i, alive: 0 });
 	}
 
 	var initialGridState = {
@@ -24347,7 +24395,7 @@
 	  width: '52.5em',
 	  noOfCells: 3500,
 	  speed: 'normal',
-	  generations: 1,
+	  generation: 1,
 	  cells: cells
 	};
 
@@ -24356,24 +24404,48 @@
 	  var action = arguments[1];
 
 	  switch (action.type) {
+	    case 'CLEAR_GRID':
+	      {
+	        var cellArray = [];
+	        for (var _i = 0; _i < state.cells.length; _i++) {
+	          cellArray.push({ id: _i, alive: 0 });
+	        }
+	        return _extends({}, state, {
+	          generation: 0,
+	          running: false,
+	          cells: cellArray
+	        });
+	      }
+	    case 'LOAD_RANDOM_GRID':
+	      return _extends({}, state, {
+	        cells: action.array
+	      });
+	    case 'PAUSE_GRID':
+	      return _extends({}, state, {
+	        running: false
+	      });
+	    case 'RUN_GRID':
+	      return _extends({}, state, {
+	        running: true
+	      });
 	    case 'SET_GRID_SIZE':
 	      {
 	        var area = action.width * action.height;
-	        var cellArray = [];
-	        for (var _i = 0; _i < area; _i++) {
-	          cellArray.push({ id: _i, status: 'off' });
+	        var _cellArray = [];
+	        for (var _i2 = 0; _i2 < area; _i2++) {
+	          _cellArray.push({ id: _i2, alive: 0 });
 	        }
 	        return _extends({}, state, {
 	          width: action.width * 0.75 + 'em',
 	          noOfCells: area,
-	          cells: cellArray
+	          cells: _cellArray
 	        });
 	      }
 	    case 'TOGGLE_CELL':
 	      {
 	        var newArray = state.cells.map(function (cell) {
 	          if (cell.id === action.id) {
-	            var newStatus = !cell.alive;
+	            var newStatus = cell.alive === 0 ? 1 : 0;
 	            return _extends({}, cell, {
 	              alive: newStatus
 	            });
@@ -24738,6 +24810,41 @@
 			URL.revokeObjectURL(oldSrc);
 	}
 
+
+/***/ },
+/* 236 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.generateArr = undefined;
+
+	var _configureStore = __webpack_require__(230);
+
+	var _configureStore2 = _interopRequireDefault(_configureStore);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	// eslint-disable-line
+
+	var generateArr = exports.generateArr = function generateArr() {
+	  var len = _configureStore2.default.getState().grid.cells.length;
+	  var randomArr = [];
+	  var max = 11;
+	  for (var i = 0; i < len; i += 1) {
+	    // generate a random alive value, skewing toward 0
+	    var randomInt = Math.floor(Math.random() * (max - 0)) + 0;
+	    var alive = randomInt === 1 ? 1 : 0;
+	    randomArr.push({
+	      id: i,
+	      alive: alive
+	    });
+	  }
+	  return randomArr;
+	};
 
 /***/ }
 /******/ ]);
