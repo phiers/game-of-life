@@ -6,6 +6,12 @@ const actions = {
       height,
     };
   },
+  toggleCell(id) {
+    return {
+      type: 'TOGGLE_CELL',
+      id,
+    };
+  },
 };
 
 export default actions;

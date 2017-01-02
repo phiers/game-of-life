@@ -10,7 +10,7 @@ export default class TopControls extends React.Component {
             <button className="button">Pause</button>
             <button className="button">Clear</button>
           </div>
-          <p>Generations: <span>1000</span></p>
+          <p>Generations: <span>0</span></p>
         </div>
       </div>
     );

@@ -1,18 +1,19 @@
 import React, { PropTypes, Component } from 'react';
 import { connect } from 'react-redux';
 
+import actions from 'actions'; // eslint-disable-line
 import Cell from 'Cell'; // eslint-disable-line
 
 class Grid extends Component {
 
   render() {
-    const { status, width } = this.props.grid;
+    const { cells, width, running } = this.props.grid;
     const renderCells = () => {
-      if (!status) {
+      if (!cells) {
         return <p>Loading...</p>;
       }
-      return status.map((item, index) =>
-        <Cell key={index} pos={index} status={item} />,
+      return cells.map(cell =>
+        <Cell key={cell.id} running={running} {...cell} />,
       );
     };
     return (
@@ -28,7 +29,8 @@ export default connect(state => state)(Grid);
 
 Grid.propTypes = {
   grid: PropTypes.shape({
-    status: PropTypes.array.isRequired,
+    cells: PropTypes.array.isRequired,
+    running: PropTypes.bool.isRequired,
     width: PropTypes.string.isRequired,
   }),
 };

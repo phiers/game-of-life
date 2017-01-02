@@ -1,18 +1,35 @@
-import React from 'react';
+import React, { PropTypes, Component } from 'react';
+import { connect } from 'react-redux';
+import actions from 'actions'; // eslint-disable-line
 
-const Cell = (props) => {
-  const handleClick = (evt) => {
+
+class Cell extends Component {
+  constructor() {
+    super();
+    this.handleClick = this.handleClick.bind(this);
+  }
+  handleClick(evt) {
+    const { dispatch, id, running } = this.props;
     evt.preventDefault();
-    const pos = props.pos;
-    props.updateStatus(pos);
-  };
-  return (
-    <div className="grid-cell" id={props.status} onClick={handleClick} /> // eslint-disable-line
-  );
-};
+    if (running) { // TODO: need to change this to !running
+      dispatch(actions.toggleCell(id));
+    }
+  }
+  render() {
+    const { alive } = this.props;
+    const cellClass = alive ? 'grid-cell on' : 'grid-cell';
 
-export default Cell;
+    return (
+      <div className={cellClass} onClick={this.handleClick} /> // eslint-disable-line
+    );
+  }
+}
+
+export default connect()(Cell);
 
 Cell.propTypes = {
-  status: React.PropTypes.string.isRequired,
+  alive: PropTypes.bool.isRequired,
+  dispatch: PropTypes.func.isRequired,
+  id: PropTypes.number.isRequired,
+  running: PropTypes.bool.isRequired,
 };
