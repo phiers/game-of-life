@@ -24247,7 +24247,7 @@
 	var generateArr = exports.generateArr = function generateArr() {
 	  var len = _configureStore2.default.getState().grid.cells.length;
 	  var randomArr = [];
-	  var max = 11;
+	  var max = 10;
 	  for (var i = 0; i < len; i += 1) {
 	    // generate a random alive value, skewing toward 0
 	    var randomInt = Math.floor(Math.random() * (max - 0)) + 0;
@@ -24266,36 +24266,42 @@
 	  var nextArr = [];
 	  var widthString = _configureStore2.default.getState().grid.width;
 	  var width = parseFloat(widthString) / 0.75;
-	  // set const for starting position of last row, excl first cell
+	  // set const for starting position of last row
 	  var lastRowStart = len - width;
-	  var corners = [0, 69, 3430, 3499];
-	  // TODO: temp holder for corners
-	  for (var c = 0; c < corners.length; c += 1) {
-	    var index = corners[c];
-	    nextArr[index] = { id: index, alive: 1 };
+	  // iterate thru top row of grid, allowing for first and last cell (corners)
+	  for (var t = 0; t < width; t += 1) {
+	    if (t === 0) {
+	      // top left corner of grid
+	      var topLeftSum = sumNeighbors(t, width, currentArr, 'topLeft');
+	      buildNewArr(t, topLeftSum, currentArr, nextArr);
+	    } else if (t === width - 1) {
+	      // top right corner of grid
+	      var topRightSum = sumNeighbors(t, width, currentArr, 'topRight');
+	      buildNewArr(t, topRightSum, currentArr, nextArr);
+	    } else {
+	      var topSum = sumNeighbors(t, width, currentArr, 'top');
+	      buildNewArr(t, topSum, currentArr, nextArr);
+	    }
 	  }
-
-	  // iterate thru top row of grid, TODO: exclude first and last cell
-	  for (var t = 1; t < width - 1; t += 1) {
-	    // nextArr[a] = { id: a, alive: 0 };
-	    var topSum = sumNeighbors(t, width, currentArr, 'top');
-	    buildNewArr(t, topSum, currentArr, nextArr);
+	  // iterate thru last row, allowing for first and last cell (corners)
+	  for (var b = lastRowStart; b < len; b += 1) {
+	    if (b === lastRowStart) {
+	      // bottom left corner of grid
+	      var bottomLeftSum = sumNeighbors(b, width, currentArr, 'bottomLeft');
+	      buildNewArr(b, bottomLeftSum, currentArr, nextArr);
+	    } else if (b === len - 1) {
+	      var bottomRightSum = sumNeighbors(b, width, currentArr, 'bottomRight');
+	      buildNewArr(b, bottomRightSum, currentArr, nextArr);
+	    } else {
+	      var bottomSum = sumNeighbors(b, width, currentArr, 'bottom');
+	      buildNewArr(b, bottomSum, currentArr, nextArr);
+	    }
 	  }
-	  // iterate thru last row excluding first and last cell (corners)
-	  for (var b = lastRowStart + 1; b < len - 1; b += 1) {
-	    // nextArr[b] = { id: b, alive: 0 };
-	    var bottomSum = sumNeighbors(b, width, currentArr, 'bottom');
-	    buildNewArr(b, bottomSum, currentArr, nextArr);
-	  }
-	  // iterate thru left column excluding first and last cells (corners)
 	  // iterate array excluding first and last row of grid
-	  // TODO: if I want to exclude the first and last column, this gets complicated
-	  // would it work if I just took them last, and overwrite these results?
 	  for (var i = width; i < len - width; i += 1) {
-	    // cases for first and last column - skip without doing anything
+	    // cases for first and last column
 	    if (i % width === 0) {
 	      // first column
-	      console.log(i);
 	      var leftSum = sumNeighbors(i, width, currentArr, 'left');
 	      buildNewArr(i, leftSum, currentArr, nextArr);
 	    } else if ((i + 1) % width === 0) {
@@ -24350,6 +24356,23 @@
 	    case 'left':
 	      // index 70 => 71, 139, 0, 69, 1, 140, 209, 141
 	      indexes = [ind + 1, ind - 1 + width, ind - width, ind - 1, ind + 1 - width, ind + width, ind - 1 + width * 2, ind + 1 + width];
+	      break;
+	    case 'topLeft':
+	      // index 0
+	      indexes = [ind - 1 + len, ind + (len - width), ind + 1 + (len - width), ind - 1 + width, ind + 1, ind - 1 + width * 2, ind + width, ind + 1 + width];
+	      break;
+	    case 'topRight':
+	      // index = width - 1
+	      indexes = [ind - 1 + (len - width), ind + (len - width), ind + 1 + (len - 2 * width), ind - 1, ind + 1 - width, ind - 1 + width, ind + width, ind + 1];
+	      break;
+	    case 'bottomLeft':
+	      // index = len - width
+	      indexes = [ind - 1, ind - width, ind + 1 - width, ind - 1 + width, ind + 1, ind - 1 - (len - 2 * width), ind - (len - width), ind + 1 - (len - width)];
+	      break;
+	    case 'bottomRight':
+	      // index = len - 1
+	      indexes = [ind - 1 - width, ind - width, ind + 1 - 2 * width, ind - 1, ind + 1 - width, ind - 1 - (len - width), ind - (len - width), ind + 1 - (len - width)];
+	      console.log(indexes);
 	      break;
 	    default:
 	      indexes = [ind + 1, ind - 1, ind - width, ind - 1 - width, ind + 1 - width, ind + width, ind - 1 + width, ind + 1 + width];
