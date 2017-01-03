@@ -7,7 +7,6 @@ for (let i = 0; i < 3500; i++) {
 const initialGridState = {
   running: true,
   width: '52.5em',
-  noOfCells: 3500,
   speed: 'normal',
   generation: 1,
   cells,
@@ -41,6 +40,8 @@ const gridReducer = (state = initialGridState, action) => {
       return {
         ...state,
         running: true,
+        generation: action.generation,
+        cells: action.array,
       };
     case 'SET_GRID_SIZE': {
       const area = action.width * action.height;
@@ -50,8 +51,9 @@ const gridReducer = (state = initialGridState, action) => {
       }
       return {
         ...state,
+        running: false,
         width: `${action.width * 0.75}em`,
-        noOfCells: area,
+        generation: 0,
         cells: cellArray,
       };
     }

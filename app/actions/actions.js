@@ -15,9 +15,11 @@ const actions = {
       type: 'PAUSE_GRID',
     };
   },
-  runGrid() {
+  runGrid(generation, array) {
     return {
-      type: 'RUN_GRID',  // PROBABLY NEED PAYLOAD
+      type: 'RUN_GRID',
+      generation,
+      array,
     };
   },
   setGridSize(width, height) {

@@ -116,7 +116,7 @@
 
 	var _actions2 = _interopRequireDefault(_actions);
 
-	var _run = __webpack_require__(236);
+	var _run = __webpack_require__(232);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -125,7 +125,7 @@
 	/* eslint-disable */
 	$(document).foundation();
 	// App css
-	__webpack_require__(232);
+	__webpack_require__(233);
 	/* eslint-enable */
 
 	_configureStore2.default.subscribe(function () {
@@ -24006,9 +24006,12 @@
 	      type: 'PAUSE_GRID'
 	    };
 	  },
-	  runGrid: function runGrid() {
+	  runGrid: function runGrid(generation, array) {
 	    return {
-	      type: 'RUN_GRID' };
+	      type: 'RUN_GRID',
+	      generation: generation,
+	      array: array
+	    };
 	  },
 	  setGridSize: function setGridSize(width, height) {
 	    return {
@@ -24132,13 +24135,16 @@
 
 	var _actions2 = _interopRequireDefault(_actions);
 
+	var _run = __webpack_require__(232);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } // eslint-disable-line
+
 
 	// eslint-disable-line
 	/* eslint-disable max-len */
@@ -24155,7 +24161,9 @@
 	    key: 'render',
 	    value: function render() {
 	      var dispatch = this.props.dispatch;
+	      var generation = this.props.grid.generation;
 
+	      var genCount = generation + 1;
 	      return _react2.default.createElement(
 	        'div',
 	        { className: 'controls top-controls' },
@@ -24168,7 +24176,7 @@
 	            _react2.default.createElement(
 	              'button',
 	              { className: 'button', onClick: function onClick() {
-	                  dispatch(_actions2.default.runGrid());
+	                  dispatch(_actions2.default.runGrid(genCount, (0, _run.generateNextArr)()));
 	                } },
 	              'Run'
 	            ),
@@ -24194,7 +24202,7 @@
 	            _react2.default.createElement(
 	              'span',
 	              null,
-	              this.props.grid.generation
+	              generation
 	            )
 	          )
 	        )
@@ -24393,7 +24401,6 @@
 	var initialGridState = {
 	  running: true,
 	  width: '52.5em',
-	  noOfCells: 3500,
 	  speed: 'normal',
 	  generation: 1,
 	  cells: cells
@@ -24426,7 +24433,9 @@
 	      });
 	    case 'RUN_GRID':
 	      return _extends({}, state, {
-	        running: true
+	        running: true,
+	        generation: action.generation,
+	        cells: action.array
 	      });
 	    case 'SET_GRID_SIZE':
 	      {
@@ -24436,8 +24445,9 @@
 	          _cellArray.push({ id: _i2, alive: 0 });
 	        }
 	        return _extends({}, state, {
+	          running: false,
 	          width: action.width * 0.75 + 'em',
-	          noOfCells: area,
+	          generation: 0,
 	          cells: _cellArray
 	        });
 	      }
@@ -24467,13 +24477,121 @@
 /* 232 */
 /***/ function(module, exports, __webpack_require__) {
 
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	exports.generateNextArr = exports.generateArr = undefined;
+
+	var _configureStore = __webpack_require__(230);
+
+	var _configureStore2 = _interopRequireDefault(_configureStore);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	// eslint-disable-line
+
+	var generateArr = exports.generateArr = function generateArr() {
+	  var len = _configureStore2.default.getState().grid.cells.length;
+	  var randomArr = [];
+	  var max = 11;
+	  for (var i = 0; i < len; i += 1) {
+	    // generate a random alive value, skewing toward 0
+	    var randomInt = Math.floor(Math.random() * (max - 0)) + 0;
+	    var alive = randomInt === 1 ? 1 : 0;
+	    randomArr.push({
+	      id: i,
+	      alive: alive
+	    });
+	  }
+	  return randomArr;
+	};
+
+	var generateNextArr = exports.generateNextArr = function generateNextArr() {
+	  var len = _configureStore2.default.getState().grid.cells.length;
+	  var currentArr = _configureStore2.default.getState().grid.cells;
+	  var nextArr = [];
+	  var widthString = _configureStore2.default.getState().grid.width;
+	  var width = parseFloat(widthString) / 0.75;
+	  // set const for starting position of last row, excl first cell
+	  var lastRowStart = len - width;
+	  // iterate thru first row of grid, excluding first and last cell
+	  for (var a = 0; a < width; a += 1) {
+	    nextArr[a] = { id: a, alive: 0 };
+	  }
+	  // iterate thru last row
+	  for (var b = lastRowStart; b < len; b += 1) {
+	    nextArr[b] = { id: b, alive: 0 };
+	  }
+	  // iterate array excluding first and last row of grid
+	  for (var i = width; i < len - width; i += 1) {
+	    // case for first column
+	    if (i % width === 0) {
+	      nextArr[i] = { id: i, alive: 1 };
+	      // case for last column
+	    } else if ((i + 1) % width === 0) {
+	      nextArr[i] = { id: i, alive: 1 };
+	      // case for all other cells
+	    } else {
+	      // sum neighbors to determine actions
+	      var neighborSum = sumNeighbors(i, width, currentArr); // eslint-disable-line
+	      if (currentArr[i].alive === 0) {
+	        if (neighborSum === 3) {
+	          nextArr[i] = { id: i, alive: 1 };
+	        } else {
+	          nextArr[i] = currentArr[i];
+	        }
+	      } else if (currentArr[i].alive === 1) {
+	        if (neighborSum < 2 || neighborSum > 3) {
+	          nextArr[i] = { id: i, alive: 0 };
+	        } else {
+	          nextArr[i] = currentArr[i];
+	        }
+	      }
+	    }
+	  }
+	  return nextArr;
+	};
+
+	function sumNeighbors(ind, width, arr, gridPosition) {
+	  var indexes = [];
+	  switch (gridPosition) {
+	    case 'top':
+	      indexes = [ind + 1, ind - 1, ind - width, ind - (width - 1), ind - (width + 1), ind + width, ind + (width - 1), ind + (width + 1)];
+	      break;
+	    case 'bottom':
+	      indexes = [ind + 1, ind - 1, ind - width, ind - (width - 1), ind - (width + 1), ind + width, ind + (width - 1), ind + (width + 1)];
+	      break;
+	    case 'right':
+	      indexes = [ind + 1, ind - 1, ind - width, ind - (width - 1), ind - (width + 1), ind + width, ind + (width - 1), ind + (width + 1)];
+	      break;
+	    case 'left':
+	      indexes = [ind + 1, ind - 1, ind - width, ind - (width - 1), ind - (width + 1), ind + width, ind + (width - 1), ind + (width + 1)];
+	      break;
+	    default:
+	      indexes = [ind + 1, ind - 1, ind - width, ind - (width - 1), ind - (width + 1), ind + width, ind + (width - 1), ind + (width + 1)];
+	  }
+	  var newArr = [];
+	  for (var j = 0; j < 8; j += 1) {
+	    newArr.push(arr[indexes[j]].alive);
+	  }
+	  return newArr.reduce(function (a, b) {
+	    return a + b;
+	  });
+	}
+
+/***/ },
+/* 233 */
+/***/ function(module, exports, __webpack_require__) {
+
 	// style-loader: Adds some css to the DOM by adding a <style> tag
 
 	// load the styles
-	var content = __webpack_require__(233);
+	var content = __webpack_require__(234);
 	if(typeof content === 'string') content = [[module.id, content, '']];
 	// add the styles to the DOM
-	var update = __webpack_require__(235)(content, {});
+	var update = __webpack_require__(236)(content, {});
 	if(content.locals) module.exports = content.locals;
 	// Hot Module Replacement
 	if(false) {
@@ -24490,10 +24608,10 @@
 	}
 
 /***/ },
-/* 233 */
+/* 234 */
 /***/ function(module, exports, __webpack_require__) {
 
-	exports = module.exports = __webpack_require__(234)();
+	exports = module.exports = __webpack_require__(235)();
 	// imports
 
 
@@ -24504,7 +24622,7 @@
 
 
 /***/ },
-/* 234 */
+/* 235 */
 /***/ function(module, exports) {
 
 	/*
@@ -24560,7 +24678,7 @@
 
 
 /***/ },
-/* 235 */
+/* 236 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/*
@@ -24810,41 +24928,6 @@
 			URL.revokeObjectURL(oldSrc);
 	}
 
-
-/***/ },
-/* 236 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	exports.generateArr = undefined;
-
-	var _configureStore = __webpack_require__(230);
-
-	var _configureStore2 = _interopRequireDefault(_configureStore);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	// eslint-disable-line
-
-	var generateArr = exports.generateArr = function generateArr() {
-	  var len = _configureStore2.default.getState().grid.cells.length;
-	  var randomArr = [];
-	  var max = 11;
-	  for (var i = 0; i < len; i += 1) {
-	    // generate a random alive value, skewing toward 0
-	    var randomInt = Math.floor(Math.random() * (max - 0)) + 0;
-	    var alive = randomInt === 1 ? 1 : 0;
-	    randomArr.push({
-	      id: i,
-	      alive: alive
-	    });
-	  }
-	  return randomArr;
-	};
 
 /***/ }
 /******/ ]);

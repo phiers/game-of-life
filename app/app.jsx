@@ -5,7 +5,7 @@ import { Provider } from 'react-redux';
 import Main from 'Main';
 import store from 'configureStore';
 import actions from 'actions';
-import { generateArr } from 'run';
+import { generateArr, generateNextArr } from 'run';
 
 // Load foundation
 $(document).foundation();
