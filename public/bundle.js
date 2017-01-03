@@ -116,7 +116,7 @@
 
 	var _actions2 = _interopRequireDefault(_actions);
 
-	var _run = __webpack_require__(232);
+	var _run = __webpack_require__(229);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -23810,7 +23810,7 @@
 
 	var _TopControls2 = _interopRequireDefault(_TopControls);
 
-	var _BottomControls = __webpack_require__(229);
+	var _BottomControls = __webpack_require__(232);
 
 	var _BottomControls2 = _interopRequireDefault(_BottomControls);
 
@@ -24135,7 +24135,7 @@
 
 	var _actions2 = _interopRequireDefault(_actions);
 
-	var _run = __webpack_require__(232);
+	var _run = __webpack_require__(229);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -24234,123 +24234,134 @@
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
+	exports.generateNextArr = exports.generateArr = undefined;
 
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	var _configureStore = __webpack_require__(230);
 
-	var _react = __webpack_require__(8);
-
-	var _react2 = _interopRequireDefault(_react);
-
-	var _reactRedux = __webpack_require__(185);
-
-	var _actions = __webpack_require__(226);
-
-	var _actions2 = _interopRequireDefault(_actions);
+	var _configureStore2 = _interopRequireDefault(_configureStore);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
 	// eslint-disable-line
+	/* eslint-disable no-use-before-define */
+	var generateArr = exports.generateArr = function generateArr() {
+	  var len = _configureStore2.default.getState().grid.cells.length;
+	  var randomArr = [];
+	  var max = 11;
+	  for (var i = 0; i < len; i += 1) {
+	    // generate a random alive value, skewing toward 0
+	    var randomInt = Math.floor(Math.random() * (max - 0)) + 0;
+	    var alive = randomInt === 1 ? 1 : 0;
+	    randomArr.push({
+	      id: i,
+	      alive: alive
+	    });
+	  }
+	  return randomArr;
+	};
 
-	var BottomControls = function (_Component) {
-	  _inherits(BottomControls, _Component);
-
-	  function BottomControls() {
-	    _classCallCheck(this, BottomControls);
-
-	    var _this = _possibleConstructorReturn(this, (BottomControls.__proto__ || Object.getPrototypeOf(BottomControls)).call(this));
-
-	    _this.handleSizeChange = _this.handleSizeChange.bind(_this);
-	    return _this;
+	var generateNextArr = exports.generateNextArr = function generateNextArr() {
+	  var len = _configureStore2.default.getState().grid.cells.length;
+	  var currentArr = _configureStore2.default.getState().grid.cells;
+	  var nextArr = [];
+	  var widthString = _configureStore2.default.getState().grid.width;
+	  var width = parseFloat(widthString) / 0.75;
+	  // set const for starting position of last row, excl first cell
+	  var lastRowStart = len - width;
+	  var corners = [0, 69, 3430, 3499];
+	  // TODO: temp holder for corners
+	  for (var c = 0; c < corners.length; c += 1) {
+	    var index = corners[c];
+	    nextArr[index] = { id: index, alive: 1 };
 	  }
 
-	  _createClass(BottomControls, [{
-	    key: 'handleSizeChange',
-	    value: function handleSizeChange(evt) {
-	      evt.preventDefault();
-	      var dispatch = this.props.dispatch;
-
-	      var size = evt.target.textContent;
-	      var height = parseInt(size.substr(5, 7), 10);
-	      var width = parseInt(size.substr(0, 2), 10);
-	      dispatch(_actions2.default.setGridSize(width, height));
+	  // iterate thru top row of grid, TODO: exclude first and last cell
+	  for (var t = 1; t < width - 1; t += 1) {
+	    // nextArr[a] = { id: a, alive: 0 };
+	    var topSum = sumNeighbors(t, width, currentArr, 'top');
+	    buildNewArr(t, topSum, currentArr, nextArr);
+	  }
+	  // iterate thru last row excluding first and last cell (corners)
+	  for (var b = lastRowStart + 1; b < len - 1; b += 1) {
+	    // nextArr[b] = { id: b, alive: 0 };
+	    var bottomSum = sumNeighbors(b, width, currentArr, 'bottom');
+	    buildNewArr(b, bottomSum, currentArr, nextArr);
+	  }
+	  // iterate thru left column excluding first and last cells (corners)
+	  // iterate array excluding first and last row of grid
+	  // TODO: if I want to exclude the first and last column, this gets complicated
+	  // would it work if I just took them last, and overwrite these results?
+	  for (var i = width; i < len - width; i += 1) {
+	    // cases for first and last column - skip without doing anything
+	    if (i % width === 0) {
+	      // first column
+	      console.log(i);
+	      var leftSum = sumNeighbors(i, width, currentArr, 'left');
+	      buildNewArr(i, leftSum, currentArr, nextArr);
+	    } else if ((i + 1) % width === 0) {
+	      // last column
+	      var rightSum = sumNeighbors(i, width, currentArr, 'right');
+	      buildNewArr(i, rightSum, currentArr, nextArr);
+	    } else {
+	      // case for all other cells
+	      // sum neighbors to determine actions
+	      var neighborSum = sumNeighbors(i, width, currentArr);
+	      // Populate nextArr with new values
+	      buildNewArr(i, neighborSum, currentArr, nextArr);
 	    }
-	  }, {
-	    key: 'render',
-	    value: function render() {
-	      return _react2.default.createElement(
-	        'div',
-	        { className: 'controls bottom-controls' },
-	        _react2.default.createElement(
-	          'div',
-	          { className: 'flex-items' },
-	          _react2.default.createElement(
-	            'p',
-	            null,
-	            'Grid Size: '
-	          ),
-	          _react2.default.createElement(
-	            'div',
-	            { className: 'secondary button-group' },
-	            _react2.default.createElement(
-	              'button',
-	              { className: 'button', onClick: this.handleSizeChange },
-	              '60 x 40'
-	            ),
-	            _react2.default.createElement(
-	              'button',
-	              { className: 'button', onClick: this.handleSizeChange },
-	              '70 x 50'
-	            ),
-	            _react2.default.createElement(
-	              'button',
-	              { className: 'button', onClick: this.handleSizeChange },
-	              '80 x 60'
-	            )
-	          ),
-	          _react2.default.createElement(
-	            'p',
-	            null,
-	            'Sim Speed: '
-	          ),
-	          _react2.default.createElement(
-	            'div',
-	            { className: 'secondary button-group' },
-	            _react2.default.createElement(
-	              'button',
-	              { className: 'button' },
-	              'Slow'
-	            ),
-	            _react2.default.createElement(
-	              'button',
-	              { className: 'button' },
-	              'Medium'
-	            ),
-	            _react2.default.createElement(
-	              'button',
-	              { className: 'button' },
-	              'Fast'
-	            )
-	          )
-	        )
-	      );
-	    }
-	  }]);
-
-	  return BottomControls;
-	}(_react.Component);
-
-	exports.default = (0, _reactRedux.connect)()(BottomControls);
-
-
-	BottomControls.propTypes = {
-	  dispatch: _react.PropTypes.func
+	  }
+	  return nextArr;
 	};
+	/* eslint-disable no-param-reassign */
+	// function to build array based on neighbor rules
+	function buildNewArr(ind, sum, oldArr, updateArr) {
+	  if (oldArr[ind].alive === 0) {
+	    if (sum === 3) {
+	      updateArr[ind] = { id: ind, alive: 1 };
+	    } else {
+	      updateArr[ind] = oldArr[ind];
+	    }
+	  } else if (oldArr[ind].alive === 1) {
+	    if (sum < 2 || sum > 3) {
+	      updateArr[ind] = { id: ind, alive: 0 };
+	    } else {
+	      updateArr[ind] = oldArr[ind];
+	    }
+	  }
+	}
+	// function to sum neighbor values for use in buildNewArr
+	function sumNeighbors(ind, width, arr, gridPosition) {
+	  var indexes = [];
+	  var len = arr.length;
+	  switch (gridPosition) {
+	    // assume a 70 x 50 grid -- tested results in JSBin
+	    case 'top':
+	      // index 1 => 0, 2, 3431, 3432, 3430, 71, 70, 72
+	      indexes = [ind + 1, ind - 1, ind + (len - width), ind + 1 + (len - width), ind - 1 + (len - width), ind + width, ind - 1 + width, ind + 1 + width];
+	      break;
+	    case 'bottom':
+	      // index 3431 => 3430, 3432, 3360, 3361, 3362, 1, 0, 2
+	      indexes = [ind + 1, ind - 1, ind - width, ind - 1 - width, ind + 1 - width, ind - (len - width), ind - 1 - (len - width), ind + 1 - (len - width)];
+	      break;
+	    case 'right':
+	      // index 139 => 70, 138, 69, 68, 0, 209, 208, 140
+	      indexes = [ind + 1 - width, ind - 1, ind - width, ind - 1 - width, ind + 1 - width * 2, ind + width, ind - 1 + width, ind + 1];
+	      break;
+	    case 'left':
+	      // index 70 => 71, 139, 0, 69, 1, 140, 209, 141
+	      indexes = [ind + 1, ind - 1 + width, ind - width, ind - 1, ind + 1 - width, ind + width, ind - 1 + width * 2, ind + 1 + width];
+	      break;
+	    default:
+	      indexes = [ind + 1, ind - 1, ind - width, ind - 1 - width, ind + 1 - width, ind + width, ind - 1 + width, ind + 1 + width];
+	  }
+	  var newArr = [];
+	  for (var j = 0; j < 8; j += 1) {
+	    newArr.push(arr[indexes[j]].alive);
+	  }
+	  return newArr.reduce(function (a, b) {
+	    return a + b;
+	  });
+	}
 
 /***/ },
 /* 230 */
@@ -24482,104 +24493,123 @@
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-	exports.generateNextArr = exports.generateArr = undefined;
 
-	var _configureStore = __webpack_require__(230);
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-	var _configureStore2 = _interopRequireDefault(_configureStore);
+	var _react = __webpack_require__(8);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _reactRedux = __webpack_require__(185);
+
+	var _actions = __webpack_require__(226);
+
+	var _actions2 = _interopRequireDefault(_actions);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
 	// eslint-disable-line
 
-	var generateArr = exports.generateArr = function generateArr() {
-	  var len = _configureStore2.default.getState().grid.cells.length;
-	  var randomArr = [];
-	  var max = 11;
-	  for (var i = 0; i < len; i += 1) {
-	    // generate a random alive value, skewing toward 0
-	    var randomInt = Math.floor(Math.random() * (max - 0)) + 0;
-	    var alive = randomInt === 1 ? 1 : 0;
-	    randomArr.push({
-	      id: i,
-	      alive: alive
-	    });
-	  }
-	  return randomArr;
-	};
+	var BottomControls = function (_Component) {
+	  _inherits(BottomControls, _Component);
 
-	var generateNextArr = exports.generateNextArr = function generateNextArr() {
-	  var len = _configureStore2.default.getState().grid.cells.length;
-	  var currentArr = _configureStore2.default.getState().grid.cells;
-	  var nextArr = [];
-	  var widthString = _configureStore2.default.getState().grid.width;
-	  var width = parseFloat(widthString) / 0.75;
-	  // set const for starting position of last row, excl first cell
-	  var lastRowStart = len - width;
-	  // iterate thru first row of grid, excluding first and last cell
-	  for (var a = 0; a < width; a += 1) {
-	    nextArr[a] = { id: a, alive: 0 };
+	  function BottomControls() {
+	    _classCallCheck(this, BottomControls);
+
+	    var _this = _possibleConstructorReturn(this, (BottomControls.__proto__ || Object.getPrototypeOf(BottomControls)).call(this));
+
+	    _this.handleSizeChange = _this.handleSizeChange.bind(_this);
+	    return _this;
 	  }
-	  // iterate thru last row
-	  for (var b = lastRowStart; b < len; b += 1) {
-	    nextArr[b] = { id: b, alive: 0 };
-	  }
-	  // iterate array excluding first and last row of grid
-	  for (var i = width; i < len - width; i += 1) {
-	    // case for first column
-	    if (i % width === 0) {
-	      nextArr[i] = { id: i, alive: 1 };
-	      // case for last column
-	    } else if ((i + 1) % width === 0) {
-	      nextArr[i] = { id: i, alive: 1 };
-	      // case for all other cells
-	    } else {
-	      // sum neighbors to determine actions
-	      var neighborSum = sumNeighbors(i, width, currentArr); // eslint-disable-line
-	      if (currentArr[i].alive === 0) {
-	        if (neighborSum === 3) {
-	          nextArr[i] = { id: i, alive: 1 };
-	        } else {
-	          nextArr[i] = currentArr[i];
-	        }
-	      } else if (currentArr[i].alive === 1) {
-	        if (neighborSum < 2 || neighborSum > 3) {
-	          nextArr[i] = { id: i, alive: 0 };
-	        } else {
-	          nextArr[i] = currentArr[i];
-	        }
-	      }
+
+	  _createClass(BottomControls, [{
+	    key: 'handleSizeChange',
+	    value: function handleSizeChange(evt) {
+	      evt.preventDefault();
+	      var dispatch = this.props.dispatch;
+
+	      var size = evt.target.textContent;
+	      var height = parseInt(size.substr(5, 7), 10);
+	      var width = parseInt(size.substr(0, 2), 10);
+	      dispatch(_actions2.default.setGridSize(width, height));
 	    }
-	  }
-	  return nextArr;
-	};
+	  }, {
+	    key: 'render',
+	    value: function render() {
+	      return _react2.default.createElement(
+	        'div',
+	        { className: 'controls bottom-controls' },
+	        _react2.default.createElement(
+	          'div',
+	          { className: 'flex-items' },
+	          _react2.default.createElement(
+	            'p',
+	            null,
+	            'Grid Size: '
+	          ),
+	          _react2.default.createElement(
+	            'div',
+	            { className: 'secondary button-group' },
+	            _react2.default.createElement(
+	              'button',
+	              { className: 'button', onClick: this.handleSizeChange },
+	              '60 x 40'
+	            ),
+	            _react2.default.createElement(
+	              'button',
+	              { className: 'button', onClick: this.handleSizeChange },
+	              '70 x 50'
+	            ),
+	            _react2.default.createElement(
+	              'button',
+	              { className: 'button', onClick: this.handleSizeChange },
+	              '80 x 60'
+	            )
+	          ),
+	          _react2.default.createElement(
+	            'p',
+	            null,
+	            'Sim Speed: '
+	          ),
+	          _react2.default.createElement(
+	            'div',
+	            { className: 'secondary button-group' },
+	            _react2.default.createElement(
+	              'button',
+	              { className: 'button' },
+	              'Slow'
+	            ),
+	            _react2.default.createElement(
+	              'button',
+	              { className: 'button' },
+	              'Medium'
+	            ),
+	            _react2.default.createElement(
+	              'button',
+	              { className: 'button' },
+	              'Fast'
+	            )
+	          )
+	        )
+	      );
+	    }
+	  }]);
 
-	function sumNeighbors(ind, width, arr, gridPosition) {
-	  var indexes = [];
-	  switch (gridPosition) {
-	    case 'top':
-	      indexes = [ind + 1, ind - 1, ind - width, ind - (width - 1), ind - (width + 1), ind + width, ind + (width - 1), ind + (width + 1)];
-	      break;
-	    case 'bottom':
-	      indexes = [ind + 1, ind - 1, ind - width, ind - (width - 1), ind - (width + 1), ind + width, ind + (width - 1), ind + (width + 1)];
-	      break;
-	    case 'right':
-	      indexes = [ind + 1, ind - 1, ind - width, ind - (width - 1), ind - (width + 1), ind + width, ind + (width - 1), ind + (width + 1)];
-	      break;
-	    case 'left':
-	      indexes = [ind + 1, ind - 1, ind - width, ind - (width - 1), ind - (width + 1), ind + width, ind + (width - 1), ind + (width + 1)];
-	      break;
-	    default:
-	      indexes = [ind + 1, ind - 1, ind - width, ind - (width - 1), ind - (width + 1), ind + width, ind + (width - 1), ind + (width + 1)];
-	  }
-	  var newArr = [];
-	  for (var j = 0; j < 8; j += 1) {
-	    newArr.push(arr[indexes[j]].alive);
-	  }
-	  return newArr.reduce(function (a, b) {
-	    return a + b;
-	  });
-	}
+	  return BottomControls;
+	}(_react.Component);
+
+	exports.default = (0, _reactRedux.connect)()(BottomControls);
+
+
+	BottomControls.propTypes = {
+	  dispatch: _react.PropTypes.func
+	};
 
 /***/ },
 /* 233 */
