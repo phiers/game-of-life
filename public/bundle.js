@@ -24266,35 +24266,36 @@
 	  var nextArr = [];
 	  var widthString = _configureStore2.default.getState().grid.width;
 	  var width = parseFloat(widthString) / 0.75;
+	  var neighborSum = 0;
 	  // set const for starting position of last row
 	  var lastRowStart = len - width;
 	  // iterate thru top row of grid, allowing for first and last cell (corners)
 	  for (var t = 0; t < width; t += 1) {
 	    if (t === 0) {
 	      // top left corner of grid
-	      var topLeftSum = sumNeighbors(t, width, currentArr, 'topLeft');
-	      buildNewArr(t, topLeftSum, currentArr, nextArr);
+	      neighborSum = sumNeighbors(t, width, currentArr, 'topLeft');
+	      buildNewArr(t, neighborSum, currentArr, nextArr);
 	    } else if (t === width - 1) {
 	      // top right corner of grid
-	      var topRightSum = sumNeighbors(t, width, currentArr, 'topRight');
-	      buildNewArr(t, topRightSum, currentArr, nextArr);
+	      neighborSum = sumNeighbors(t, width, currentArr, 'topRight');
+	      buildNewArr(t, neighborSum, currentArr, nextArr);
 	    } else {
-	      var topSum = sumNeighbors(t, width, currentArr, 'top');
-	      buildNewArr(t, topSum, currentArr, nextArr);
+	      neighborSum = sumNeighbors(t, width, currentArr, 'top');
+	      buildNewArr(t, neighborSum, currentArr, nextArr);
 	    }
 	  }
 	  // iterate thru last row, allowing for first and last cell (corners)
 	  for (var b = lastRowStart; b < len; b += 1) {
 	    if (b === lastRowStart) {
 	      // bottom left corner of grid
-	      var bottomLeftSum = sumNeighbors(b, width, currentArr, 'bottomLeft');
-	      buildNewArr(b, bottomLeftSum, currentArr, nextArr);
+	      neighborSum = sumNeighbors(b, width, currentArr, 'bottomLeft');
+	      buildNewArr(b, neighborSum, currentArr, nextArr);
 	    } else if (b === len - 1) {
-	      var bottomRightSum = sumNeighbors(b, width, currentArr, 'bottomRight');
-	      buildNewArr(b, bottomRightSum, currentArr, nextArr);
+	      neighborSum = sumNeighbors(b, width, currentArr, 'bottomRight');
+	      buildNewArr(b, neighborSum, currentArr, nextArr);
 	    } else {
-	      var bottomSum = sumNeighbors(b, width, currentArr, 'bottom');
-	      buildNewArr(b, bottomSum, currentArr, nextArr);
+	      neighborSum = sumNeighbors(b, width, currentArr, 'bottom');
+	      buildNewArr(b, neighborSum, currentArr, nextArr);
 	    }
 	  }
 	  // iterate array excluding first and last row of grid
@@ -24302,16 +24303,16 @@
 	    // cases for first and last column
 	    if (i % width === 0) {
 	      // first column
-	      var leftSum = sumNeighbors(i, width, currentArr, 'left');
-	      buildNewArr(i, leftSum, currentArr, nextArr);
+	      neighborSum = sumNeighbors(i, width, currentArr, 'left');
+	      buildNewArr(i, neighborSum, currentArr, nextArr);
 	    } else if ((i + 1) % width === 0) {
 	      // last column
-	      var rightSum = sumNeighbors(i, width, currentArr, 'right');
-	      buildNewArr(i, rightSum, currentArr, nextArr);
+	      neighborSum = sumNeighbors(i, width, currentArr, 'right');
+	      buildNewArr(i, neighborSum, currentArr, nextArr);
 	    } else {
 	      // case for all other cells
 	      // sum neighbors to determine actions
-	      var neighborSum = sumNeighbors(i, width, currentArr);
+	      neighborSum = sumNeighbors(i, width, currentArr);
 	      // Populate nextArr with new values
 	      buildNewArr(i, neighborSum, currentArr, nextArr);
 	    }
@@ -24371,8 +24372,7 @@
 	      break;
 	    case 'bottomRight':
 	      // index = len - 1
-	      indexes = [ind - 1 - width, ind - width, ind + 1 - 2 * width, ind - 1, ind + 1 - width, ind - 1 - (len - width), ind - (len - width), ind + 1 - (len - width)];
-	      console.log(indexes);
+	      indexes = [ind - 1 - width, ind - width, ind + 1 - 2 * width, ind - 1, ind + 1 - width, ind - 1 - (len - width), ind - (len - width), ind + 1 - len];
 	      break;
 	    default:
 	      indexes = [ind + 1, ind - 1, ind - width, ind - 1 - width, ind + 1 - width, ind + width, ind - 1 + width, ind + 1 + width];
