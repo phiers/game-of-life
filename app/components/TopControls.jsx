@@ -13,7 +13,7 @@ class TopControls extends Component {
   }
   handleRun() {
     const { dispatch } = this.props;
-    const { speed, running, cells } = this.props.grid;
+    const { speed, running } = this.props.grid;
     const run = () => dispatch(actions.runGrid(generateNextArr()));
     if (!running) {
       const interval = window.setInterval(run, speed);

@@ -1,5 +1,5 @@
 .controls {
-  background: black;
+  background: lighten(#1779BA, 10%);
   width: 45em;
   margin: 0 auto;
 }
@@ -21,8 +21,9 @@
       outline: none;
     }
     p {
-      background: #767676;
+      background: darken(#1779BA, 15%);
       color: white;
+      border: 1px solid darkgray;
       margin: 0 auto;
       padding: .5em .2em .2em .5em;
 
@@ -37,6 +38,7 @@
 
 .bottom-controls {
   display: flex;
+  background: black;
   .flex-items {
     flex: 1;
     display: flex;
@@ -52,8 +54,7 @@
       outline: none;
     }
     p {
-      background: white;
-      color: black;
+      color: white;
       margin: 0 .15em 0 0;
       padding: .5em .8em 0 .4em;
     }

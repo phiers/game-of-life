@@ -55,7 +55,7 @@ class BottomControls extends Component {
           <p>Sim Speed: </p>
           <div className="secondary button-group">
             <button className="button" onClick={this.handleSpeedChange}>Slow</button>
-            <button className="button" onClick={this.handleSpeedChange}>Medium</button>
+            <button className="button" onClick={this.handleSpeedChange}>Normal</button>
             <button className="button" onClick={this.handleSpeedChange}>Fast</button>
           </div>
         </div>

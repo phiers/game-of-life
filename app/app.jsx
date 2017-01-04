@@ -14,8 +14,7 @@ require('style!css!sass!applicationStyles');
 /* eslint-enable */
 
 store.subscribe(() => {
-  const state = store.getState();
-  console.log(state);
+  store.getState();
 });
 
 store.dispatch(actions.loadRandomGrid(generateArr()));
