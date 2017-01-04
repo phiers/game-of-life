@@ -1,6 +1,6 @@
 .grid {
 
-  background: darken(#1779BA, 15%);
+  background: white;
   line-height: .6;
   margin: 0 auto;
 
@@ -9,11 +9,11 @@
     display: inline-block;
     min-width: .75em;
     min-height: .75em;
-    border: .1em solid darkgray;
+    border: .05px solid lightgray;
 
   }
 
   .on {
-    background: white;
+    background: darken(#1779BA, 15%);
   }
 }
