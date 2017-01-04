@@ -132,7 +132,7 @@
 	  var state = _configureStore2.default.getState();
 	  console.log(state);
 	});
-	// TODO: add dispatch to activate grid
+
 	_configureStore2.default.dispatch(_actions2.default.loadRandomGrid((0, _run.generateArr)()));
 
 	_reactDom2.default.render(_react2.default.createElement(
@@ -23916,6 +23916,8 @@
 
 	var _Cell2 = _interopRequireDefault(_Cell);
 
+	var _run = __webpack_require__(229);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -23923,6 +23925,7 @@
 	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } // eslint-disable-line
+	// eslint-disable-line
 
 
 	// eslint-disable-line
@@ -23937,6 +23940,24 @@
 	  }
 
 	  _createClass(Grid, [{
+	    key: 'componentDidMount',
+	    value: function componentDidMount() {
+	      var dispatch = this.props.dispatch;
+	      var speed = this.props.grid.speed;
+
+	      var interval = window.setInterval(function () {
+	        return dispatch(_actions2.default.runGrid((0, _run.generateNextArr)()));
+	      }, speed);
+	      dispatch(_actions2.default.setIntervalName(interval));
+	    }
+	  }, {
+	    key: 'componentWillUnmount',
+	    value: function componentWillUnmount() {
+	      var interval = this.props.grid.interval;
+
+	      window.clearInterval(interval);
+	    }
+	  }, {
 	    key: 'render',
 	    value: function render() {
 	      var _props$grid = this.props.grid,
@@ -23973,9 +23994,12 @@
 
 
 	Grid.propTypes = {
+	  dispatch: _react.PropTypes.func,
 	  grid: _react.PropTypes.shape({
 	    cells: _react.PropTypes.array.isRequired,
+	    interval: _react.PropTypes.number,
 	    running: _react.PropTypes.bool.isRequired,
+	    speed: _react.PropTypes.number.isRequired,
 	    width: _react.PropTypes.string.isRequired
 	  })
 	};
@@ -23990,6 +24014,12 @@
 	  value: true
 	});
 	var actions = {
+	  changeSpeed: function changeSpeed(speed) {
+	    return {
+	      type: 'CHANGE_SPEED',
+	      speed: speed
+	    };
+	  },
 	  clearGrid: function clearGrid() {
 	    return {
 	      type: 'CLEAR_GRID'
@@ -24006,10 +24036,9 @@
 	      type: 'PAUSE_GRID'
 	    };
 	  },
-	  runGrid: function runGrid(generation, array) {
+	  runGrid: function runGrid(array) {
 	    return {
 	      type: 'RUN_GRID',
-	      generation: generation,
 	      array: array
 	    };
 	  },
@@ -24018,6 +24047,12 @@
 	      type: 'SET_GRID_SIZE',
 	      width: width,
 	      height: height
+	    };
+	  },
+	  setIntervalName: function setIntervalName(interval) {
+	    return {
+	      type: 'SET_INTERVAL_NAME',
+	      interval: interval
 	    };
 	  },
 	  toggleCell: function toggleCell(id) {
@@ -24148,22 +24183,67 @@
 
 	// eslint-disable-line
 	/* eslint-disable max-len */
+
 	var TopControls = function (_Component) {
 	  _inherits(TopControls, _Component);
 
 	  function TopControls() {
 	    _classCallCheck(this, TopControls);
 
-	    return _possibleConstructorReturn(this, (TopControls.__proto__ || Object.getPrototypeOf(TopControls)).apply(this, arguments));
+	    var _this = _possibleConstructorReturn(this, (TopControls.__proto__ || Object.getPrototypeOf(TopControls)).call(this));
+
+	    _this.handleRun = _this.handleRun.bind(_this);
+	    _this.handlePause = _this.handlePause.bind(_this);
+	    _this.handleClear = _this.handleClear.bind(_this);
+	    return _this;
 	  }
 
 	  _createClass(TopControls, [{
+	    key: 'handleRun',
+	    value: function handleRun() {
+	      var dispatch = this.props.dispatch;
+	      var _props$grid = this.props.grid,
+	          speed = _props$grid.speed,
+	          running = _props$grid.running,
+	          cells = _props$grid.cells;
+
+	      var run = function run() {
+	        return dispatch(_actions2.default.runGrid((0, _run.generateNextArr)()));
+	      };
+	      if (!running) {
+	        var interval = window.setInterval(run, speed);
+	        dispatch(_actions2.default.setIntervalName(interval));
+	      }
+	    }
+	  }, {
+	    key: 'handlePause',
+	    value: function handlePause() {
+	      var dispatch = this.props.dispatch;
+	      var _props$grid2 = this.props.grid,
+	          interval = _props$grid2.interval,
+	          running = _props$grid2.running;
+
+	      if (running) {
+	        dispatch(_actions2.default.pauseGrid());
+	        window.clearInterval(interval);
+	      }
+	    }
+	  }, {
+	    key: 'handleClear',
+	    value: function handleClear() {
+	      var dispatch = this.props.dispatch;
+	      var interval = this.props.grid.interval;
+
+	      dispatch(_actions2.default.clearGrid());
+	      if (interval) {
+	        window.clearInterval(interval);
+	      }
+	    }
+	  }, {
 	    key: 'render',
 	    value: function render() {
-	      var dispatch = this.props.dispatch;
 	      var generation = this.props.grid.generation;
 
-	      var genCount = generation + 1;
 	      return _react2.default.createElement(
 	        'div',
 	        { className: 'controls top-controls' },
@@ -24175,23 +24255,17 @@
 	            { className: 'secondary button-group' },
 	            _react2.default.createElement(
 	              'button',
-	              { className: 'button', onClick: function onClick() {
-	                  dispatch(_actions2.default.runGrid(genCount, (0, _run.generateNextArr)()));
-	                } },
+	              { className: 'button', onClick: this.handleRun },
 	              'Run'
 	            ),
 	            _react2.default.createElement(
 	              'button',
-	              { className: 'button', onClick: function onClick() {
-	                  dispatch(_actions2.default.pauseGrid());
-	                } },
+	              { className: 'button', onClick: this.handlePause },
 	              'Pause'
 	            ),
 	            _react2.default.createElement(
 	              'button',
-	              { className: 'button', onClick: function onClick() {
-	                  dispatch(_actions2.default.clearGrid());
-	                } },
+	              { className: 'button', onClick: this.handleClear },
 	              'Clear'
 	            )
 	          ),
@@ -24221,7 +24295,10 @@
 	TopControls.propTypes = {
 	  dispatch: _react.PropTypes.func.isRequired,
 	  grid: _react.PropTypes.shape({
-	    generation: _react.PropTypes.number.isRequired
+	    generation: _react.PropTypes.number.isRequired,
+	    interval: _react.PropTypes.number,
+	    running: _react.PropTypes.bool.isRequired,
+	    speed: _react.PropTypes.number.isRequired
 	  })
 	};
 
@@ -24247,7 +24324,7 @@
 	var generateArr = exports.generateArr = function generateArr() {
 	  var len = _configureStore2.default.getState().grid.cells.length;
 	  var randomArr = [];
-	  var max = 10;
+	  var max = 7;
 	  for (var i = 0; i < len; i += 1) {
 	    // generate a random alive value, skewing toward 0
 	    var randomInt = Math.floor(Math.random() * (max - 0)) + 0;
@@ -24433,9 +24510,10 @@
 	}
 
 	var initialGridState = {
-	  running: true,
+	  interval: null,
+	  running: false,
 	  width: '52.5em',
-	  speed: 'normal',
+	  speed: 500,
 	  generation: 1,
 	  cells: cells
 	};
@@ -24445,6 +24523,10 @@
 	  var action = arguments[1];
 
 	  switch (action.type) {
+	    case 'CHANGE_SPEED':
+	      return _extends({}, state, {
+	        speed: action.speed
+	      });
 	    case 'CLEAR_GRID':
 	      {
 	        var cellArray = [];
@@ -24452,6 +24534,7 @@
 	          cellArray.push({ id: _i, alive: 0 });
 	        }
 	        return _extends({}, state, {
+	          interval: null,
 	          generation: 0,
 	          running: false,
 	          cells: cellArray
@@ -24466,11 +24549,14 @@
 	        running: false
 	      });
 	    case 'RUN_GRID':
-	      return _extends({}, state, {
-	        running: true,
-	        generation: action.generation,
-	        cells: action.array
-	      });
+	      {
+	        var newGen = state.generation + 1;
+	        return _extends({}, state, {
+	          running: true,
+	          generation: newGen,
+	          cells: action.array
+	        });
+	      }
 	    case 'SET_GRID_SIZE':
 	      {
 	        var area = action.width * action.height;
@@ -24485,6 +24571,10 @@
 	          cells: _cellArray
 	        });
 	      }
+	    case 'SET_INTERVAL_NAME':
+	      return _extends({}, state, {
+	        interval: action.interval
+	      });
 	    case 'TOGGLE_CELL':
 	      {
 	        var newArray = state.cells.map(function (cell) {
@@ -24529,13 +24619,16 @@
 
 	var _actions2 = _interopRequireDefault(_actions);
 
+	var _run = __webpack_require__(229);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } // eslint-disable-line
+
 
 	// eslint-disable-line
 
@@ -24548,6 +24641,7 @@
 	    var _this = _possibleConstructorReturn(this, (BottomControls.__proto__ || Object.getPrototypeOf(BottomControls)).call(this));
 
 	    _this.handleSizeChange = _this.handleSizeChange.bind(_this);
+	    _this.handleSpeedChange = _this.handleSpeedChange.bind(_this);
 	    return _this;
 	  }
 
@@ -24561,6 +24655,37 @@
 	      var height = parseInt(size.substr(5, 7), 10);
 	      var width = parseInt(size.substr(0, 2), 10);
 	      dispatch(_actions2.default.setGridSize(width, height));
+	      dispatch(_actions2.default.loadRandomGrid((0, _run.generateArr)()));
+	    }
+	  }, {
+	    key: 'handleSpeedChange',
+	    value: function handleSpeedChange(evt) {
+	      evt.preventDefault();
+	      var dispatch = this.props.dispatch;
+	      var _props$grid = this.props.grid,
+	          interval = _props$grid.interval,
+	          running = _props$grid.running;
+
+	      var speedText = evt.target.textContent;
+	      var speed = void 0;
+	      if (speedText === 'Slow') {
+	        speed = 1000;
+	      } else if (speedText === 'Fast') {
+	        speed = 250;
+	      } else {
+	        speed = 500;
+	      }
+	      if (running) {
+	        // interval has current speed, so it has to be cleared and restarted
+	        window.clearInterval(interval);
+	        dispatch(_actions2.default.changeSpeed(speed));
+	        var run = function run() {
+	          return dispatch(_actions2.default.runGrid((0, _run.generateNextArr)()));
+	        };
+	        var intervalID = window.setInterval(run, speed);
+	        dispatch(_actions2.default.setIntervalName(intervalID));
+	      }
+	      dispatch(_actions2.default.changeSpeed(speed));
 	    }
 	  }, {
 	    key: 'render',
@@ -24605,17 +24730,17 @@
 	            { className: 'secondary button-group' },
 	            _react2.default.createElement(
 	              'button',
-	              { className: 'button' },
+	              { className: 'button', onClick: this.handleSpeedChange },
 	              'Slow'
 	            ),
 	            _react2.default.createElement(
 	              'button',
-	              { className: 'button' },
+	              { className: 'button', onClick: this.handleSpeedChange },
 	              'Medium'
 	            ),
 	            _react2.default.createElement(
 	              'button',
-	              { className: 'button' },
+	              { className: 'button', onClick: this.handleSpeedChange },
 	              'Fast'
 	            )
 	          )
@@ -24627,11 +24752,17 @@
 	  return BottomControls;
 	}(_react.Component);
 
-	exports.default = (0, _reactRedux.connect)()(BottomControls);
+	exports.default = (0, _reactRedux.connect)(function (state) {
+	  return state;
+	})(BottomControls);
 
 
 	BottomControls.propTypes = {
-	  dispatch: _react.PropTypes.func
+	  dispatch: _react.PropTypes.func,
+	  grid: _react.PropTypes.shape({
+	    interval: _react.PropTypes.number,
+	    running: _react.PropTypes.bool
+	  })
 	};
 
 /***/ },

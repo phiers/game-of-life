@@ -5,15 +5,21 @@ for (let i = 0; i < 3500; i++) {
 }
 
 const initialGridState = {
-  running: true,
+  interval: null,
+  running: false,
   width: '52.5em',
-  speed: 'normal',
+  speed: 500,
   generation: 1,
   cells,
 };
 
 const gridReducer = (state = initialGridState, action) => {
   switch (action.type) {
+    case 'CHANGE_SPEED':
+      return {
+        ...state,
+        speed: action.speed,
+      };
     case 'CLEAR_GRID': {
       const cellArray = [];
       for (let i = 0; i < state.cells.length; i++) {
@@ -21,6 +27,7 @@ const gridReducer = (state = initialGridState, action) => {
       }
       return {
         ...state,
+        interval: null,
         generation: 0,
         running: false,
         cells: cellArray,
@@ -36,13 +43,15 @@ const gridReducer = (state = initialGridState, action) => {
         ...state,
         running: false,
       };
-    case 'RUN_GRID':
+    case 'RUN_GRID': {
+      const newGen = state.generation + 1;
       return {
         ...state,
         running: true,
-        generation: action.generation,
+        generation: newGen,
         cells: action.array,
       };
+    }
     case 'SET_GRID_SIZE': {
       const area = action.width * action.height;
       const cellArray = [];
@@ -57,6 +66,11 @@ const gridReducer = (state = initialGridState, action) => {
         cells: cellArray,
       };
     }
+    case 'SET_INTERVAL_NAME':
+      return {
+        ...state,
+        interval: action.interval,
+      };
     case 'TOGGLE_CELL': {
       const newArray = state.cells.map((cell) => {
         if (cell.id === action.id) {

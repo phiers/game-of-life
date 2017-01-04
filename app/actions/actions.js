@@ -1,4 +1,10 @@
 const actions = {
+  changeSpeed(speed) {
+    return {
+      type: 'CHANGE_SPEED',
+      speed,
+    };
+  },
   clearGrid() {
     return {
       type: 'CLEAR_GRID',
@@ -15,10 +21,9 @@ const actions = {
       type: 'PAUSE_GRID',
     };
   },
-  runGrid(generation, array) {
+  runGrid(array) {
     return {
       type: 'RUN_GRID',
-      generation,
       array,
     };
   },
@@ -27,6 +32,12 @@ const actions = {
       type: 'SET_GRID_SIZE',
       width,
       height,
+    };
+  },
+  setIntervalName(interval) {
+    return {
+      type: 'SET_INTERVAL_NAME',
+      interval,
     };
   },
   toggleCell(id) {

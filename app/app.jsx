@@ -17,7 +17,7 @@ store.subscribe(() => {
   const state = store.getState();
   console.log(state);
 });
-// TODO: add dispatch to activate grid
+
 store.dispatch(actions.loadRandomGrid(generateArr()));
 
 ReactDOM.render(
